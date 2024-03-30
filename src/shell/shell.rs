@@ -16,7 +16,7 @@ impl Shell {
         self
     }
 
-    pub fn args(&mut self, a: Vec<&str>) -> &mut Self {
+    pub fn args(&mut self, a: &[&str]) -> &mut Self {
         self.shell.args(a);
         self
     }
@@ -40,7 +40,7 @@ impl Shell {
         self.shell.spawn().expect("failed to spawn command")
     }
 
-    pub fn result(&mut self) -> String {
+    pub fn result_to_string(&mut self) -> String {
         String::from_utf8(self.output().stdout).expect("cannot convert stdout to string")
     }
 

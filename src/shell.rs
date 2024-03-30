@@ -1,3 +1,2 @@
-pub mod shell_cmd;
-pub mod command;
+pub mod shell;
 mod test;

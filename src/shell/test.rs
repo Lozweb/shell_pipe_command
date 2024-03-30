@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test {
-    use crate::shell::command::{Shell};
+    use crate::shell::shell::{Shell};
 
     #[test]
     fn piped_cmd(){
@@ -9,7 +9,7 @@ mod test {
             .arg("test_file")
             .pipe("grep")
             .arg("l")
-            .result();
+            .result_to_string();
 
         println!("{}", grep_from_file);
     }
