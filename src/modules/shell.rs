@@ -26,6 +26,7 @@ impl Shell {
         let out = child.stdout.expect("failed to open child stdout");
         let mut new_cmd = Shell { shell: Command::new(cmd)};
         new_cmd.shell.stdin(Stdio::from(out));
+        new_cmd.shell.stdout(Stdio::piped());
         new_cmd
     }
 
