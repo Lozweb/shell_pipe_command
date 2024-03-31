@@ -1,4 +1,5 @@
-use std::process::{Child, Command, Output, Stdio};
+use std::io;
+use std::process::{Child, Command, ExitStatus, Output, Stdio};
 
 pub struct Shell{
     pub(crate) shell: Command
@@ -27,22 +28,40 @@ impl Shell {
         let mut new_cmd = Shell { shell: Command::new(cmd)};
         new_cmd.shell.stdin(Stdio::from(out));
         new_cmd.shell.stdout(Stdio::piped());
+        new_cmd.shell.stderr(Stdio::piped());
         new_cmd
     }
 
-    pub fn output(&mut self) -> Output {
-        self
-            .exec()
-            .wait_with_output()
-            .expect("failed with wait output")
-    }
-
-    pub fn exec(&mut self)-> Child {
-        self.shell.spawn().expect("failed to spawn command")
-    }
-
     pub fn result_to_string(&mut self) -> String {
-        String::from_utf8(self.output().stdout).expect("cannot convert stdout to string")
+
+        let output = self.output();
+
+        if output.stdout.len() > 0 {
+            Self::bytes_to_string(output.stdout)
+        } else {
+            Self::bytes_to_string(output.stderr)
+        }
+
+    }
+
+    fn bytes_to_string(out:Vec<u8>) -> String {
+        String::from_utf8(out).unwrap_or_else(|err| err.to_string())
+    }
+
+    fn output(&mut self) -> Output {
+
+        match self.exec() {
+            Ok(child) => child.wait_with_output().expect("failed wait with output"),
+            Err(err) => Output {
+                status: ExitStatus::default(),
+                stdout: vec![],
+                stderr: Vec::from(err.to_string().as_bytes()),
+            }
+         }
+    }
+    //todo wait with output handler
+    fn exec(&mut self)-> io::Result<Child> {
+        self.shell.spawn()
     }
 
 }
